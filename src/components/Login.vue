@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {defineComponent, ref} from 'vue';
+import {ref} from 'vue';
+import 'element-plus/es/components/message/style/css'
 import {ElMessage} from "element-plus";
-
 
 // name: 'Login',
 
