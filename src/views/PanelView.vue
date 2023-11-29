@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import {
+  UserFilled,
   HomeFilled,
-  Document,
   Menu as IconMenu,
-  Location,
+  GoodsFilled,
   Setting,
+  WalletFilled,
 } from '@element-plus/icons-vue'
 
 const handleOpen = (key: string, keyPath: string[]) => {
@@ -28,37 +29,39 @@ const handleClose = (key: string, keyPath: string[]) => {
             @open="handleOpen"
             @close="handleClose"
         >
+          <el-menu-item index="0">
+            <el-icon>
+              <home-filled/>
+            </el-icon>
+            <span>用户中心</span>
+          </el-menu-item>
           <el-sub-menu index="1">
             <template #title>
               <el-icon>
-                <location/>
+                <user-filled/>
               </el-icon>
-              <span>Navigator One</span>
+              <span>账户管理</span>
             </template>
-            <el-menu-item-group title="Group One">
-              <el-menu-item index="1-1">item one</el-menu-item>
-              <el-menu-item index="1-2">item two</el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="Group Two">
-              <el-menu-item index="1-3">item three</el-menu-item>
-            </el-menu-item-group>
-            <el-sub-menu index="1-4">
-              <template #title>item four</template>
-              <el-menu-item index="1-4-1">item one</el-menu-item>
-            </el-sub-menu>
+            <el-menu-item index="1-1">个人信息</el-menu-item>
+            <el-menu-item index="1-2">安全中心</el-menu-item>
           </el-sub-menu>
           <el-menu-item index="2">
             <el-icon>
-              <icon-menu/>
+              <goods-filled/>
             </el-icon>
-            <span>Navigator Two</span>
+            <span>我的商品</span>
           </el-menu-item>
-          <el-menu-item index="3" disabled>
-            <el-icon>
-              <document/>
-            </el-icon>
-            <span>Navigator Three</span>
-          </el-menu-item>
+          <el-sub-menu index="3">
+            <template #title>
+              <el-icon>
+                <wallet-filled/>
+              </el-icon>
+              <span>订单管理</span>
+            </template>
+            <el-menu-item index="3-1">我的订单</el-menu-item>
+            <el-menu-item index="3-2">我的投诉</el-menu-item>
+            <el-menu-item index="3-3">找我售后</el-menu-item>
+          </el-sub-menu>
           <el-menu-item index="4">
             <el-icon>
               <setting/>
