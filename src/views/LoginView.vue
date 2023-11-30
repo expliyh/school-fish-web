@@ -16,6 +16,8 @@ import Login from "@/components/Login.vue";
   padding: 0;
   width: 100%;
   height: 100%;
+  display: flow;
+  max-width: none;
 }
 </style>
 
