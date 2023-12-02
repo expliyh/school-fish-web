@@ -12,8 +12,8 @@ import "@/assets/main.css"
       <HelloWorld msg="You did it!"/>
 
       <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/panel">Panel</RouterLink>
+        <RouterLink to="/login">Login</RouterLink>
       </nav>
     </div>
   </header>
