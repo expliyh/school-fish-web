@@ -28,6 +28,7 @@ const handleClose = (key: string, keyPath: string[]) => {
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
+            :router="true"
         >
           <el-menu-item index="0">
             <el-icon>
@@ -58,7 +59,7 @@ const handleClose = (key: string, keyPath: string[]) => {
               </el-icon>
               <span>订单管理</span>
             </template>
-            <el-menu-item index="3-1">我的订单</el-menu-item>
+            <el-menu-item index="3-1" route="/panel/order">我的订单</el-menu-item>
             <el-menu-item index="3-2">我的投诉</el-menu-item>
             <el-menu-item index="3-3">找我售后</el-menu-item>
           </el-sub-menu>
@@ -71,7 +72,9 @@ const handleClose = (key: string, keyPath: string[]) => {
         </el-menu>
       </el-aside>
       <el-container>
-        <el-main>Main</el-main>
+        <el-main>
+          <router-view></router-view>
+        </el-main>
         <el-footer>Footer</el-footer>
       </el-container>
     </el-container>

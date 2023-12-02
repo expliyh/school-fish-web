@@ -3,6 +3,7 @@ import AppView from "@/views/AppView.vue";
 import LoginView from "@/views/LoginView.vue";
 import PanelView from "@/views/PanelView.vue";
 import App from "@/App.vue";
+import MyOrderView from "@/views/MyOrderView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,7 +29,13 @@ const router = createRouter({
         {
             path: '/panel',
             name: 'panel',
-            component: PanelView
+            component: PanelView,
+            children: [
+                {
+                    path: 'order',
+                    component: MyOrderView,
+                },
+            ],
         }
     ]
 })
