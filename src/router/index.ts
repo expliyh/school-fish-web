@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import AppView from "@/views/AppView.vue";
-import LoginView from "@/views/LoginView.vue";
+import LoginView from "../views/LoginView.vue";
 import PanelView from "@/views/PanelView.vue";
 import App from "@/App.vue";
 import MyOrderView from "@/views/MyOrderView.vue";
@@ -24,16 +24,16 @@ const router = createRouter({
         {
             path: '/login',
             name: 'login',
-            component: LoginView
+            component: ()=>import('@/views/LoginView.vue')
         },
         {
             path: '/panel',
             name: 'panel',
-            component: PanelView,
+            component: () => import('@/views/PanelView.vue'),
             children: [
                 {
                     path: 'order',
-                    component: MyOrderView,
+                    component: ()=>import('@/views/MyOrderView.vue')
                 },
             ],
         }
