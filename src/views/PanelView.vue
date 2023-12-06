@@ -7,6 +7,14 @@ import {
   Setting,
   WalletFilled,
 } from '@element-plus/icons-vue'
+import router from "@/router";
+
+let token = localStorage.token
+// console.log(token)
+if (token === undefined) {
+  localStorage.token = '12345678'
+  // router.push('/login')
+}
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)

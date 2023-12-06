@@ -24,7 +24,7 @@ const router = createRouter({
         {
             path: '/login',
             name: 'login',
-            component: ()=>import('@/views/LoginView.vue')
+            component: () => import('@/views/LoginView.vue')
         },
         {
             path: '/panel',
@@ -33,7 +33,23 @@ const router = createRouter({
             children: [
                 {
                     path: 'order',
-                    component: ()=>import('@/views/MyOrderView.vue')
+                    component: () => import('@/views/MyOrderView.vue'),
+                    children: [
+                        {
+                            path: ':filter',
+                            component: () => import('@/components/Orders/AllOrder.vue'),
+                            props: true
+                        }
+                    ]
+                },
+                {
+                    path: 'wait_for_ship',
+                    component: () => import('@/components/Orders/WaitForOperate.vue')
+                },
+                {
+                    path: 'vieworder/:order_id',
+                    component: () => import('@/components/Orders/ShowOrder.vue'),
+                    props: true
                 },
             ],
         }
