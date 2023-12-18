@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import {RouterLink, RouterView} from 'vue-router'
 import router from "@/router";
+import {useUserStore} from "@/stores/user";
+
+const userStore = useUserStore()
+
+if (localStorage.token == null) {
+  router.push("/login")
+}
+
 
 </script>
 

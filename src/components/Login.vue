@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {inject, ref} from 'vue';
 import 'element-plus/es/components/message/style/css'
 import {ElMessage} from "element-plus";
+import type {AxiosResponse} from "axios";
+import {useUserStore} from "@/stores/user";
+
+const userStore = useUserStore()
+
+let token = localStorage.token
 
 // name: 'Login',
 
@@ -10,12 +16,36 @@ const loginForm = ref({
   password: '',
 });
 
+const global: any = inject("global")
+
 const handleSubmit = () => {
   // 这里可以进行用户名和密码的校验，然后执行登录逻辑
   if (!loginForm.value.username || !loginForm.value.password) {
     ElMessage.error('用户名和密码不能为空！')
     return;
   }
+  global.axios.postForm(
+      global.api_base + "/login",
+      {
+        "username": loginForm.value.username,
+        "password": loginForm.value.password
+      }
+  ).then((response: AxiosResponse<any>) => {
+        let data = response.data
+        if (data['status'] != 200) {
+          ElMessage({
+            message: data['message'],
+            type: 'error',
+          })
+          return
+        }
+        userStore.setRole(data['role'])
+        userStore.setAccessToken(data['access_token'])
+        userStore.setUsername(data['username'])
+        localStorage.token = data['access_token']
+        window.location.href = "/"
+      }
+  )
   alert('登录成功！');
   // 执行登录操作，例如发起网络请求等
 };

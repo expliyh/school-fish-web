@@ -8,13 +8,9 @@ import {
   WalletFilled,
 } from '@element-plus/icons-vue'
 import router from "@/router";
+import {useUserStore} from "@/stores/user";
 
-let token = localStorage.token
-// console.log(token)
-if (token === undefined) {
-  localStorage.token = '12345678'
-  // router.push('/login')
-}
+const userStore = useUserStore()
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
@@ -38,44 +34,23 @@ const handleClose = (key: string, keyPath: string[]) => {
             @close="handleClose"
             :router="true"
         >
-          <el-menu-item index="0">
+          <el-menu-item index="0" route="/panel">
             <el-icon>
               <home-filled/>
             </el-icon>
             <span>用户中心</span>
           </el-menu-item>
-          <el-sub-menu index="1">
-            <template #title>
-              <el-icon>
-                <user-filled/>
-              </el-icon>
-              <span>账户管理</span>
-            </template>
-            <el-menu-item index="1-1">个人信息</el-menu-item>
-            <el-menu-item index="1-2">安全中心</el-menu-item>
-          </el-sub-menu>
-          <el-menu-item index="2">
+          <el-menu-item v-if="userStore.getRole()=='marketing'" index="1" route="/panel/add-proc">
             <el-icon>
-              <goods-filled/>
+              <user-filled/>
             </el-icon>
-            <span>我的商品</span>
+            <span>采购录入</span>
           </el-menu-item>
-          <el-sub-menu index="3">
-            <template #title>
-              <el-icon>
-                <wallet-filled/>
-              </el-icon>
-              <span>订单管理</span>
-            </template>
-            <el-menu-item index="3-1" route="/panel/order">我的订单</el-menu-item>
-            <el-menu-item index="3-2">我的投诉</el-menu-item>
-            <el-menu-item index="3-3">找我售后</el-menu-item>
-          </el-sub-menu>
-          <el-menu-item index="4">
+          <el-menu-item v-if="userStore.getRole()=='marketing'" index="2">
             <el-icon>
-              <setting/>
+              <user-filled/>
             </el-icon>
-            <span>Navigator Four</span>
+            <span>销售录入</span>
           </el-menu-item>
         </el-menu>
       </el-aside>

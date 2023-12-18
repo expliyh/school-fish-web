@@ -5,7 +5,9 @@ import {
   InfoFilled
 } from '@element-plus/icons-vue'
 import {ElMessage} from 'element-plus'
+import {useUserStore} from "@/stores/user";
 
+const userStore = useUserStore()
 const token = localStorage.token
 
 const global: any = inject("global")
@@ -119,13 +121,13 @@ function getOperateLink(status: number, order_id: string) {
 
 function reloadData(page_count: number, per_page: number) {
   let api_url
-  api_url = global.api_base + "/get_order_page";
+  api_url = global.api_base + "/get_sales_page";
   let data
   console.log(api_url)
   global.axios.postForm(
       api_url,
       {
-        "token": "12345678",
+        "token": userStore.accessToken,
         "filter": props.filter,
         "page_count": currentPage.value,
         "per_page": pageSize.value
@@ -187,22 +189,10 @@ const handleCurrentChange = (val: number) => {
         </el-popconfirm>
       </template>
     </el-table-column>
-    <el-table-column prop="order_id" label="交易号" width="180"/>
-    <el-table-column prop="type" label="交易类型" width="100"/>
-    <el-table-column prop="balance" label="交易金额" width="100"/>
+    <el-table-column prop="order_id" label="订单号" width="180"/>
+    <el-table-column prop="balance" label="订单金额" width="100"/>
     <el-table-column prop="item_name" label="商品名称" width="180"/>
-    <el-table-column prop="trader" label="交易对象" width="150"/>
     <el-table-column prop="create_date" label="创建时间" width="150"/>
-    <el-table-column prop="pay_date" label="付款时间" width="180"/>
-    <el-table-column prop="status" label="交易状态" width="80">
-      <template #default="scope">
-        <el-tag
-            :type="scope.row.status['type']"
-            disable-transitions
-        >{{ scope.row.status['info'] }}
-        </el-tag>
-      </template>
-    </el-table-column>
   </el-table>
   <div class="pagination-block">
     <el-pagination

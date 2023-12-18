@@ -31,7 +31,7 @@ const disable_pay = ref(true)
 const disable_cancel = ref(true)
 const disable_warranty = ref(true)
 const disable_confirm = ref(true)
-const confirm_message = ref("此订单不可确认收货")
+const confirm_message = ref("此交易不可确认收货")
 const am_I_seller = ref(false)
 
 function getOrderInfo() {
@@ -39,7 +39,7 @@ function getOrderInfo() {
   disable_cancel.value = true
   disable_warranty.value = true
   disable_confirm.value = true
-  confirm_message.value = "此订单不可确认收货"
+  confirm_message.value = "此交易不可确认收货"
   const info_link = global.api_base + "/get_order";
   global.axios.postForm(
       info_link,
@@ -55,12 +55,12 @@ function getOrderInfo() {
     } else if (uid == order["buyerID"]) {
       am_I_seller.value = false
     } else {
-      ElMessage.error('这不是你的订单')
+      ElMessage.error('这不是你的交易')
       disable_pay.value = true
       disable_cancel.value = true
       disable_warranty.value = true
       disable_confirm.value = true
-      confirm_message.value = '这不是你的订单'
+      confirm_message.value = '这不是你的交易'
       return
     }
     switch (order["orderStatus"]) {
@@ -72,7 +72,7 @@ function getOrderInfo() {
         order_tag_title.value = '未定义'
         break
       case 0:
-        if (!am_I_seller) {
+        if (!am_I_seller.value) {
           disable_confirm.value = false
           confirm_message.value = "确认线下交易完成"
           disable_cancel.value = false
@@ -89,14 +89,14 @@ function getOrderInfo() {
           confirm_message.value = "确认收货"
         } else {
           disable_confirm.value = true
-          confirm_message.value = '这不是你的订单'
+          confirm_message.value = '这不是你的交易'
         }
         disable_cancel.value = false
         order_tag_type.value = 'success'
         order_tag_title.value = '已支付'
         break
       case 2:
-        if (!am_I_seller) {
+        if (!am_I_seller.value) {
           disable_confirm.value = false
           confirm_message.value = "确认收货"
         }
@@ -125,10 +125,10 @@ function getOrderInfo() {
         break
     }
     order_props.value = []
-    order_props.value.push({'title': "订单号", 'value': props.order_id})
+    order_props.value.push({'title': "交易号", 'value': props.order_id})
     order_props.value.push({'title': order["payDate"] == null ? "应付金额" : "实付金额", 'value': order['balance']})
-    order_props.value.push({'title': "卖家", 'value': am_I_seller ? order["sellerName"] + "  (我)" : order["sellerName"]})
-    order_props.value.push({'title': "买家", 'value': !am_I_seller ? order["buyerName"] + "  (我)" : order["buyerName"]})
+    order_props.value.push({'title': "卖家", 'value': am_I_seller.value ? order["sellerName"] + "  (我)" : order["sellerName"]})
+    order_props.value.push({'title': "买家", 'value': !am_I_seller.value ? order["buyerName"] + "  (我)" : order["buyerName"]})
     order_props.value.push({'title': "下单日期", 'value': order["createDate"]})
     order_props.value.push({'title': "支付日期", 'value': order["payDate"] == null ? "未支付" : order["payDate"]})
     if (order["trackingNumber"] != null) {
@@ -221,7 +221,7 @@ function confirmOrder() {
       <el-card class="box-card">
         <template #header>
           <div class="card-header">
-            <span>订单信息</span>
+            <span>交易信息</span>
             <el-space wrap style="margin-left: 40%">
               <el-button class="button" text v-model:disabled="disable_pay">支付</el-button>
               <el-button class="button" text v-model:disabled="disable_cancel">取消</el-button>
@@ -237,7 +237,7 @@ function confirmOrder() {
         <!--        <template #footer>Footer content</template>-->
         <el-row style="width: 100%" justify="start">
           <el-col :span="12">
-            订单状态
+            交易状态
           </el-col>
           <el-col :span="12">
             <el-tag

@@ -43,6 +43,10 @@ const router = createRouter({
                     ]
                 },
                 {
+                    path: 'add-proc',
+                    component: () => import('@/components/AddProcure.vue'),
+                },
+                {
                     path: 'wait_for_ship',
                     component: () => import('@/components/Orders/WaitForOperate.vue')
                 },

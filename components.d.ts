@@ -7,17 +7,22 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AddProcure: typeof import('./src/components/AddProcure.vue')['default']
+    AddSale: typeof import('./src/components/AddSale.vue')['default']
     AllOrder: typeof import('./src/components/Orders/AllOrder.vue')['default']
+    AllSales: typeof import('./src/components/AllSales.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElContainer: typeof import('element-plus/es')['ElContainer']
-    ElDialog: typeof import('element-plus/es')['ElDialog']
     ElFooter: typeof import('element-plus/es')['ElFooter']
+    ElForm: typeof import('element-plus/es')['ElForm']
+    ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElHeader: typeof import('element-plus/es')['ElHeader']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
+    ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElLink: typeof import('element-plus/es')['ElLink']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
@@ -43,7 +48,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     ShowOrder: typeof import('./src/components/Orders/ShowOrder.vue')['default']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
-    WaiForShip: typeof import('./src/components/Orders/WaitForOperate.vue')['default']
     WaitForOperate: typeof import('./src/components/Orders/WaitForOperate.vue')['default']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }
