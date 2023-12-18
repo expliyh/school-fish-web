@@ -46,7 +46,7 @@ const handleClose = (key: string, keyPath: string[]) => {
             </el-icon>
             <span>采购录入</span>
           </el-menu-item>
-          <el-menu-item v-if="userStore.getRole()=='eng'" index="1" route="/panel/add-proc">
+          <el-menu-item v-if="userStore.getRole()=='eng'" index="1" route="/panel/add-ticket">
             <el-icon>
               <user-filled/>
             </el-icon>
