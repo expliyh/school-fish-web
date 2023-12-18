@@ -109,7 +109,7 @@ function loadFromID() {
 const onSubmit = () => {
   console.log('submit!')
   global.axios.postForm(
-      global.api_base + "/procure",
+      global.api_base + "/new-sale",
       {
         "access_token": localStorage.token,
         "name": form.name,
@@ -162,6 +162,7 @@ const onSubmit = () => {
 </script>
 
 <template>
+  <h1>销售录入</h1>
   <el-form :model="form" label-width="120px">
     <el-form-item label="商品名称">
       <el-input v-model="form.name" @change="loadFromName"/>

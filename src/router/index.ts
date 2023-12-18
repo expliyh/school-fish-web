@@ -47,6 +47,10 @@ const router = createRouter({
                     component: () => import('@/components/AddProcure.vue'),
                 },
                 {
+                    path: 'add-sale',
+                    component: () => import('@/components/AddSale.vue'),
+                },
+                {
                     path: 'wait_for_ship',
                     component: () => import('@/components/Orders/WaitForOperate.vue')
                 },

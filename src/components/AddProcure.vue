@@ -162,6 +162,7 @@ const onSubmit = () => {
 </script>
 
 <template>
+  <h1>采购录入</h1>
   <el-form :model="form" label-width="120px">
     <el-form-item label="商品名称">
       <el-input v-model="form.name" @change="loadFromName"/>
