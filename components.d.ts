@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AddProcure: typeof import('./src/components/AddProcure.vue')['default']
     AddSale: typeof import('./src/components/AddSale.vue')['default']
+    AddTicket: typeof import('./src/components/AddTicket.vue')['default']
     AllOrder: typeof import('./src/components/Orders/AllOrder.vue')['default']
     AllSales: typeof import('./src/components/AllSales.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
