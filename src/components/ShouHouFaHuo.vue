@@ -44,6 +44,11 @@ function loadTicket() {
         alert_box.type = 'success'
         alert_box.title = '工单匹配成功'
         disable_submit.value = false
+        if (data['express'] != null) {
+          express_info.express_id = data['express']
+          alert_box.type = 'warning'
+          alert_box.title = '工单已发货, 现在提交将修改发货单号'
+        }
       }, (error: any) => {
         alert_box.type = 'error'
         alert_box.title = '工单匹配失败'
@@ -63,10 +68,11 @@ const onSubmit = () => {
       global.api_base + "/edit-express",
       {
         "access_token": localStorage.token,
+        "id": form.id,
         "express": express_info.express_id,
       }
   ).then((response: AxiosResponse<any>) => {
-    let data = response.data.data
+    let data = response.data
     console.log(data)
     ElMessage.success(data['message'])
   }, (error: any) => {
