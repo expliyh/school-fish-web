@@ -12,6 +12,7 @@ declare module 'vue' {
     AddTicket: typeof import('./src/components/AddTicket.vue')['default']
     AllOrder: typeof import('./src/components/Orders/AllOrder.vue')['default']
     AllSales: typeof import('./src/components/AllSales.vue')['default']
+    ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']

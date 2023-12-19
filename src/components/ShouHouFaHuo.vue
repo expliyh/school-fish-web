@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import {reactive, ref} from "vue";
+import {reactive, ref, inject} from "vue";
 import type {AxiosResponse} from "axios";
 import router from "@/router";
+import {ElMessage} from "element-plus";
+
+const global: any = inject("global")
 
 const form = reactive({
   id: '',
@@ -54,6 +57,23 @@ function loadTicket() {
   )
 }
 
+const onSubmit = () => {
+  console.log('submit!')
+  global.axios.postForm(
+      global.api_base + "/edit-express",
+      {
+        "access_token": localStorage.token,
+        "express": express_info.express_id,
+      }
+  ).then((response: AxiosResponse<any>) => {
+    let data = response.data.data
+    console.log(data)
+    ElMessage.success(data['message'])
+  }, (error: any) => {
+    ElMessage.error(error.message)
+  })
+}
+
 </script>
 
 <template>
@@ -61,6 +81,9 @@ function loadTicket() {
   <el-form :model="form" label-width="120px">
     <el-form-item label="工单编号" @change="loadTicket">
       <el-input v-model="form.id"/>
+    </el-form-item>
+    <el-form-item label="快递单号">
+      <el-input v-model="express_info.express_id" placeholder="请输入快递单号"/>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" v-model:disabled="disable_submit" @click="onSubmit">发货</el-button>

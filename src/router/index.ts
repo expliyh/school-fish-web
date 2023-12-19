@@ -59,6 +59,10 @@ const router = createRouter({
                     component: () => import('@/components/GetCount.vue'),
                 },
                 {
+                    path: 'express',
+                    component: () => import('@/components/ShouHouFaHuo.vue'),
+                },
+                {
                     path: 'add-ticket',
                     component: () => import('@/components/AddTicket.vue'),
                 },
