@@ -1,6 +1,6 @@
 <template>
   <el-form :model="form" label-width="120px">
-    <el-form-item label="工单编号">
+    <el-form-item label="工单编号" @change="loadTicket">
       <el-input v-model="form.id"/>
     </el-form-item>
     <el-form-item label="商品编号">
@@ -77,9 +77,9 @@ const form = reactive({
 
 function loadTicket() {
   global.axios.postForm(
-      global.api_base + "/get_ticket",
+      global.api_base + "/get-ticket",
       {
-        "token": localStorage.token,
+        "access_token": localStorage.token,
         "id": form.id,
       }
   ).then((response: AxiosResponse<any>) => {
@@ -97,25 +97,26 @@ function loadTicket() {
         }
       }
   )
+}
 
+const onSubmit = () => {
+  console.log('submit!')
+  global.axios.postForm(
+      global.api_base + "/add-ticket",
+      {
+        "access_token": localStorage.token,
+        "item_id": form.item_id,
+        "type": form.type,
+        "status": form.status,
+        "desc": form.desc,
+        "ticket_id": form.id
+      }
+  ).then((response: AxiosResponse<any>) => {
+    let data = response.data.data
+    console.log(data)
 
-  const onSubmit = () => {
-    console.log('submit!')
-    global.axios.postForm(
-        global.api_base + "/add_ticket",
-        {
-          "token": localStorage.token,
-          "item_id": form.item_id,
-          "type": form.type,
-          "status": form.status,
-          "desc": form.desc,
-        }
-    ).then((response: AxiosResponse<any>) => {
-      let data = response.data.data
-      console.log(data)
-
-    }, (error: any) => {
-      alert(error.message)
-    })
-  }
+  }, (error: any) => {
+    alert(error.message)
+  })
+}
 </script>

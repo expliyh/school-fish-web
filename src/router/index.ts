@@ -51,6 +51,14 @@ const router = createRouter({
                     component: () => import('@/components/AddSale.vue'),
                 },
                 {
+                    path: 'add-sale',
+                    component: () => import('@/components/AddSale.vue'),
+                },
+                {
+                    path: 'count',
+                    component: () => import('@/components/GetCount.vue'),
+                },
+                {
                     path: 'add-ticket',
                     component: () => import('@/components/AddTicket.vue'),
                 },

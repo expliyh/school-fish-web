@@ -52,6 +52,12 @@ const handleClose = (key: string, keyPath: string[]) => {
             </el-icon>
             <span>工单录入</span>
           </el-menu-item>
+          <el-menu-item v-if="userStore.getRole()=='money'" index="1" route="/panel/count">
+            <el-icon>
+              <user-filled/>
+            </el-icon>
+            <span>数据统计</span>
+          </el-menu-item>
           <el-menu-item v-if="userStore.getRole()=='marketing'" index="2" route="/panel/add-sale">
             <el-icon>
               <user-filled/>
