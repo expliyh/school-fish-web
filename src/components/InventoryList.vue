@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {InfoFilled} from "@element-plus/icons-vue";
-import {reactive} from "vue";
+import {reactive, inject} from "vue";
 
 const page = reactive(
     {
@@ -12,6 +12,8 @@ const page = reactive(
 )
 
 const tableData = reactive([])
+
+const global: any = inject("global")
 
 function loadData() {
   const api_link = global.api_base + "/inventory-list"
