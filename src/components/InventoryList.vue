@@ -1,7 +1,14 @@
 <script setup lang="ts">
 
 import {InfoFilled} from "@element-plus/icons-vue";
-import {reactive, inject} from "vue";
+import {reactive, inject, ref} from "vue";
+import {useUserStore} from "@/stores/user";
+import {usePrefillStore} from "@/stores/prefill";
+import router from "@/router";
+
+const userStore = useUserStore()
+
+const prefillStore = usePrefillStore()
 
 const page = reactive(
     {
@@ -10,39 +17,84 @@ const page = reactive(
       item_count: 0
     }
 )
-
-const tableData = reactive([])
+let tp: any[] = []
+const tableData = ref(tp)
 
 const global: any = inject("global")
 
+const role = ref("")
+
 function loadData() {
-  const api_link = global.api_base + "/inventory-list"
+  const api_link = global.api_base + "/get-inventory-list"
+  tableData.value = tp
+  role.value = userStore.getRole()
+  console.log(role.value)
   global.axios.postForm(
       api_link,
       {
-        "token": localStorage.token,
+        "access_token": localStorage.token,
         "page": page.currentPage,
         "page_size": page.pageSize
       }
   ).then((response: any) => {
-    let data = response.data
-    if (data['status'] != 200) {
-      return
-    }
-    tableData.splice(0, tableData.length)
-    tableData.push(...data['data'])
-    page.item_count = data['item_count']
-  })
+        let data = response.data
+        if (data['status'] != 200) {
+          return
+        }
+        data["data"]["data"].forEach((val: any, idx: any, array: any) => {
+          tableData.value.push({
+            item_id: val['item_id'],
+            name: val['name'],
+            price: val['price'],
+            item_count: val['quantity']
+          })
+        })
+        page.item_count = parseInt(data['data']['count'])
+      }
+  )
 }
+
+function handleSizeChange() {
+  return
+}
+
+function handleCurrentChange() {
+  return
+}
+
+loadData()
+
+function procure(row: any) {
+  console.log(row)
+  prefillStore.clear()
+  prefillStore.setItemId(row['item_id'])
+  router.push("/panel/add-proc")
+}
+
+function sale(row: any) {
+  console.log(row)
+  prefillStore.clear()
+  prefillStore.setItemId(row['item_id'])
+  router.push("/panel/add-sale")
+}
+
 </script>
 
 <template>
-  <el-table v-model:data="tableData" height="70%" style="width: 100%">
+  <el-table v-model:data="tableData" style="width: 100%">
     <el-table-column prop="item_id" label="库存号" width="180"/>
-    <el-table-column prop="name" label="商品名" width="100"/>
+    <el-table-column prop="name" label="商品名称" width="100"/>
     <el-table-column prop="price" label="商品进价" width="100"/>
-    <el-table-column prop="item_name" label="商品名称" width="180"/>
     <el-table-column prop="item_count" label="库存量" width="150"/>
+    <el-table-column label="操作" width="180">
+      <template #default="{row}">
+        <el-button type="primary" v-if="userStore.getRole()=='marketing'" round plain @click="procure(row)">
+          采购
+        </el-button>
+        <el-button type="primary" v-if="userStore.getRole()=='marketing'" round plain>销售</el-button>
+        <el-button type="primary" v-if="userStore.getRole()=='money'" round plain>查看记录</el-button>
+      </template>
+    </el-table-column>
   </el-table>
   <div class="pagination-block">
     <el-pagination
@@ -61,4 +113,8 @@ function loadData() {
 
 <style scoped>
 
+.pagination-block {
+  margin-top: 16px;
+  margin-left: 10px;
+}
 </style>

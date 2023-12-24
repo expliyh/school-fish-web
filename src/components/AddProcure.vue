@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import {inject, reactive} from 'vue'
+import {inject, reactive, ref} from 'vue'
 import type {AxiosError, AxiosResponse} from "axios";
 import router from "@/router";
 import {ElMessage} from "element-plus";
+import {usePrefillStore} from "@/stores/prefill";
+
+const prefillStore = usePrefillStore()
 
 // do not use same name with ref
 const form = reactive({
@@ -15,6 +18,8 @@ const form = reactive({
 
 
 const global: any = inject("global")
+
+const prefilled = ref(false)
 
 function loadFromName() {
   console.log('load from name')
@@ -159,16 +164,41 @@ const onSubmit = () => {
         }
       });
 }
+
+function handlePrefill() {
+  if (prefillStore.getItemId() == "") {
+    return
+  }
+  console.log('prefill')
+  form.id = prefillStore.getItemId()
+  loadFromID()
+  prefillStore.clear()
+  prefilled.value = true
+}
+
+function cancelPrefill() {
+  prefillStore.clear()
+  prefilled.value = false
+}
+
+handlePrefill()
+
 </script>
 
 <template>
   <h1>采购录入</h1>
+  <el-alert
+      v-if="prefilled"
+      title="部分数据已预装填，要更改不可用的内容请点击 取消预装填 按钮"
+      center :closable="false" type="success"
+      style="margin-bottom: 10px"
+  ></el-alert>
   <el-form :model="form" label-width="120px">
     <el-form-item label="商品名称">
-      <el-input v-model="form.name" @change="loadFromName"/>
+      <el-input v-model="form.name" v-model:disabled="prefilled" @change="loadFromName"/>
     </el-form-item>
     <el-form-item label="商品ID">
-      <el-input-number v-model="form.id" @change="loadFromID"/>
+      <el-input-number v-model="form.id" v-model:disabled="prefilled" @change="loadFromID"/>
     </el-form-item>
     <el-form-item label="单价">
       <el-input-number v-model="form.prize" :precision="2"></el-input-number>
@@ -177,7 +207,7 @@ const onSubmit = () => {
       <el-input-number v-model="form.count"></el-input-number>
     </el-form-item>
     <el-form-item label="型号">
-      <el-input v-model="form.model"></el-input>
+      <el-input v-model="form.model" v-model:disabled="prefilled"></el-input>
     </el-form-item>
     <!--    <el-form-item label="Activity zone">-->
     <!--      <el-select v-model="form.region" placeholder="please select your zone">-->
@@ -226,8 +256,8 @@ const onSubmit = () => {
     <!--      <el-input v-model="form.desc" type="textarea"/>-->
     <!--    </el-form-item>-->
     <el-form-item>
-      <el-button type="primary" @click="onSubmit">Create</el-button>
-      <el-button>Cancel</el-button>
+      <el-button type="primary" @click="onSubmit">提交采购</el-button>
+      <el-button v-if="prefilled" @click="cancelPrefill">取消预装填</el-button>
     </el-form-item>
   </el-form>
 </template>

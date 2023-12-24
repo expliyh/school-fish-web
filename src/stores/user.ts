@@ -8,6 +8,9 @@ export const useUserStore = defineStore('user', () => {
     const global: any = inject("global")
 
     function getRole(this: any) {
+        if (this.role !== "") {
+            return this.role
+        }
         global.axios.postForm(
             global.api_base + "/get-user-info",
             {

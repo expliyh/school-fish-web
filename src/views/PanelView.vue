@@ -6,6 +6,7 @@ import {
   GoodsFilled,
   Setting,
   WalletFilled,
+  List,
 } from '@element-plus/icons-vue'
 import router from "@/router";
 import {useUserStore} from "@/stores/user";
@@ -69,6 +70,12 @@ const handleClose = (key: string, keyPath: string[]) => {
               <user-filled/>
             </el-icon>
             <span>售后发货</span>
+          </el-menu-item>
+          <el-menu-item index="3" route="/panel/inventory-list">
+            <el-icon>
+              <List/>
+            </el-icon>
+            <span>设备列表</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
