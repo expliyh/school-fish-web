@@ -24,7 +24,7 @@ const auto = ref(false)
 
 function clearInput() {
   form.name = ""
-  form.id = null
+  // form.id = null
   form.prize = 0
   form.count = 0
   form.model = ""
@@ -95,10 +95,10 @@ function loadFromID() {
           // 执行操作
           console.log('请求成功');
           data = response.data.data
-          ElMessage({
-            message: data,
-            type: 'success',
-          })
+          // ElMessage({
+          //   message: data,
+          //   type: 'success',
+          // })
           form.name = data['name']
           form.prize = data['price']
           form.model = data['model']
@@ -116,6 +116,10 @@ function loadFromID() {
           if (error.response.status == 403) {
             router.push("/login")
           } else if (error.response.status == 404) {
+            if (auto.value) {
+              auto.value = false
+              clearInput()
+            }
             return
           }
         } else if (error.request) {
@@ -131,6 +135,14 @@ function loadFromID() {
 
 const onSubmit = () => {
   console.log('submit!')
+  if (form.name == "") {
+    ElMessage.error("商品名称不能为空")
+    return
+  }
+  if (form.prize < 0) {
+    ElMessage.error("应该不会有供应商倒贴吧")
+    return
+  }
   global.axios.postForm(
       global.api_base + "/procure",
       {
@@ -160,6 +172,7 @@ const onSubmit = () => {
             message: data['message'],
             type: 'success',
           })
+          router.push("/panel/inventory-list")
         } else {
           // 其他状态码处理
           console.log('其他状态码处理');
@@ -201,7 +214,9 @@ function cancelPrefill() {
 
 function idSetAuto() {
   form.id = null
-  clearInput()
+  if (auto.value) {
+    clearInput()
+  }
 }
 
 handlePrefill()
@@ -237,7 +252,7 @@ handlePrefill()
       <el-input-number v-model="form.count"></el-input-number>
     </el-form-item>
     <el-form-item label="型号">
-      <el-input v-model="form.model" v-model:disabled="auto"></el-input>
+      <el-input v-model="form.model" v-model:readonly="auto"></el-input>
     </el-form-item>
     <!--    <el-form-item label="Activity zone">-->
     <!--      <el-select v-model="form.region" placeholder="please select your zone">-->

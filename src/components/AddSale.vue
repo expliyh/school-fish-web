@@ -14,6 +14,7 @@ const form = reactive({
   name: '',
   id: null as number | null,
   prize: 0,
+  remote_prize: 0,
   count: 0,
   model: ""
 })
@@ -50,6 +51,7 @@ function loadFromName() {
           data = response.data.data
           form.id = data['id']
           form.prize = data['price']
+          form.remote_prize = data['price']
           form.model = data['model']
         } else {
           // 其他状态码处理
@@ -69,6 +71,7 @@ function loadFromName() {
             form.id = 0
             form.count = 0
             form.prize = 0
+            form.remote_prize = 0
             form.model = ""
             return
           }
@@ -103,16 +106,21 @@ function loadFromID() {
           // 执行操作
           console.log('请求成功');
           data = response.data.data
-          ElMessage({
-            message: data,
-            type: 'success',
-          })
+          // ElMessage({
+          //   message: data,
+          //   type: 'success',
+          // })
           form.name = data['name']
           form.prize = data['price']
+          form.remote_prize = data['price']
           form.model = data['model']
         } else {
           // 其他状态码处理
-          console.log('其他状态码处理');
+          try {
+            ElMessage.error("请求失败: " + response.data["message"])
+          } catch (e) {
+            ElMessage.error("请求失败: " + response.status)
+          }
         }
         auto.value = true
       })
@@ -144,6 +152,18 @@ function loadFromID() {
 
 const onSubmit = () => {
   console.log('submit!')
+  if (form.id === null) {
+    ElMessage.error("商品ID不能为空")
+    return
+  }
+  if (form.name === "") {
+    ElMessage.error("商品名称不能为空")
+    return
+  }
+  if (form.prize <= form.remote_prize) {
+    ElMessage.error("售价必须大于进价，不然会亏本哦！")
+    return
+  }
   global.axios.postForm(
       global.api_base + "/new-sale",
       {
@@ -173,6 +193,7 @@ const onSubmit = () => {
             message: data['message'],
             type: 'success',
           })
+          router.push("/panel/inventory-list")
         } else {
           // 其他状态码处理
           console.log('其他状态码处理');
@@ -184,7 +205,12 @@ const onSubmit = () => {
           // 服务器返回响应，但状态码不是2xx
           console.log('请求失败', error.response.status);
           if (error.response.status == 403) {
+            ElMessage.error("Forbidden: 登录已过期，请重新登录")
             router.push("/login")
+          }
+          if (error.response.status == 400) {
+            let data = error.response.data as any
+            ElMessage.error("Bad Request: " + data['message'])
           }
         } else if (error.request) {
           // 请求发送成功，但没有收到响应
@@ -193,6 +219,7 @@ const onSubmit = () => {
           // 其他错误
           console.log('其他错误', error.message);
         }
+        return
       });
 }
 

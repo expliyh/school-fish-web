@@ -1,10 +1,15 @@
 import {defineStore} from "pinia";
-import {inject, ref} from "vue";
+import {inject, reactive, ref} from "vue";
 
 export const usePrefillStore = defineStore('prefill', () => {
     const item_id = ref("")
     const item_name = ref("")
     const ticket_id = ref("")
+    const filter = reactive({
+        name_key: '',
+        id: '',
+        by: ''
+    })
 
     function setItemId(this: any, item_id: string | null) {
         if (item_id === null) {
@@ -42,11 +47,27 @@ export const usePrefillStore = defineStore('prefill', () => {
         this.item_id = ""
         this.item_name = ""
         this.ticket_id = ""
+        this.filter.name_key = ""
+        this.filter.id = ""
+        this.filter.by = ""
     }
+
 
     function clear(this: any) {
         this.reset()
     }
 
-    return {item_id, item_name, ticket_id, setItemId, getItemId, setItemName, setTicketId, getTicketId, reset, clear}
+    return {
+        filter,
+        item_id,
+        item_name,
+        ticket_id,
+        setItemId,
+        getItemId,
+        setItemName,
+        setTicketId,
+        getTicketId,
+        reset,
+        clear
+    }
 })

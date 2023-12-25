@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {InfoFilled} from "@element-plus/icons-vue";
+import {InfoFilled, Search} from "@element-plus/icons-vue";
 import {reactive, inject, ref} from "vue";
 import {useUserStore} from "@/stores/user";
 import {usePrefillStore} from "@/stores/prefill";
@@ -9,6 +9,12 @@ import router from "@/router";
 const userStore = useUserStore()
 
 const prefillStore = usePrefillStore()
+
+const filter = reactive({
+  name_key: '',
+  id: '',
+  by: ''
+})
 
 const page = reactive(
     {
@@ -89,9 +95,58 @@ function addTicket(row: any) {
   router.push("/panel/add-ticket")
 }
 
+function procureList(row: any) {
+  prefillStore.clear()
+  prefillStore.filter.name_key = row['item_id']
+  prefillStore.filter.by = 'item_id'
+  router.push("/panel/procure-list")
+}
+
+function handlePrefill() {
+  if (prefillStore.filter.by === 'item_id') {
+    filter.by = 'item_id'
+    filter.name_key = prefillStore.filter.name_key
+  }
+  loadData()
+}
+
+function getSearchPlaceHolder() {
+  if (filter.by === '') {
+    return '请选择搜索目标'
+  }
+  if (filter.by === 'item_name') {
+    return '搜索商品名称'
+  } else if (filter.by === 'item_id') {
+    return '搜索库存编号'
+  }
+}
+
 </script>
 
 <template>
+  <el-row>
+    <el-col :span="12">
+      <el-text>库存列表</el-text>
+    </el-col>
+    <el-col :span="9">
+      <el-input
+          v-model="filter.name_key"
+          :placeholder="getSearchPlaceHolder()"
+          :readonly="filter.by === '' || filter.by === null"
+          class="input-with-select"
+      >
+        <template #prepend>
+          <el-select v-model="filter.by" placeholder="搜索目标" style="width: 110px">
+            <el-option label="商品名称" value="item_name"/>
+            <el-option label="库存编号" value="item_id"/>
+          </el-select>
+        </template>
+        <template #append>
+          <el-button @click="loadData" :disabled="filter.by === ''||filter.by === null" :icon="Search"/>
+        </template>
+      </el-input>
+    </el-col>
+  </el-row>
   <el-table v-model:data="tableData" v-loading="listLoading" style="width: 100%">
     <el-table-column prop="item_id" label="库存号" width="180"/>
     <el-table-column prop="name" label="商品名称" width="100"/>
@@ -120,7 +175,14 @@ function addTicket(row: any) {
             @click="addTicket(row)">
           工单录入
         </el-button>
-        <el-button type="primary" v-if="userStore.getRole()=='money'" round plain>查看记录</el-button>
+        <el-button
+            type="primary"
+            v-if="userStore.getRole()=='money'"
+            round plain
+            @click="procureList(row)"
+        >
+          采购记录
+        </el-button>
       </template>
     </el-table-column>
   </el-table>
