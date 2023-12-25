@@ -5,6 +5,7 @@ import {reactive, inject, ref} from "vue";
 import {useUserStore} from "@/stores/user";
 import {usePrefillStore} from "@/stores/prefill";
 import router from "@/router";
+import {ElMessage} from "element-plus";
 
 const userStore = useUserStore()
 
@@ -23,8 +24,7 @@ const page = reactive(
       item_count: 0
     }
 )
-let tp: any[] = []
-const tableData = ref(tp)
+const tableData = ref([] as any[])
 
 const global: any = inject("global")
 
@@ -35,33 +35,47 @@ const role = ref("")
 function loadData() {
   listLoading.value = true
   const api_link = global.api_base + "/get-inventory-list"
-  tableData.value = tp
+  tableData.value = []
   role.value = userStore.getRole()
   console.log(role.value)
-  global.axios.postForm(
-      api_link,
-      {
-        "access_token": localStorage.token,
-        "page": page.currentPage,
-        "page_size": page.pageSize
+  let post_data = {
+    "access_token": localStorage.token,
+    "page": page.currentPage,
+    "page_size": page.pageSize,
+    "search": null as string | null,
+    "search_item_id": null as string | null
+  }
+  if (filter.name_key != '' || filter.name_key != null) {
+    if (filter.by == 'item_name') {
+      post_data['search'] = filter.name_key
+    } else if (filter.by == 'item_id' && filter.name_key != '' && filter.name_key != null) {
+      if (isNaN(parseInt(filter.name_key))) {
+        ElMessage.error("库存编号必须为数字")
+        return
       }
-  ).then((response: any) => {
-        let data = response.data
-        if (data['status'] != 200) {
-          return
-        }
-        data["data"]["data"].forEach((val: any, idx: any, array: any) => {
-          tableData.value.push({
-            item_id: val['item_id'],
-            name: val['name'],
-            price: val['price'],
-            item_count: val['quantity']
+      post_data['search_item_id'] = filter.name_key
+    }
+    global.axios.postForm(
+        api_link,
+        post_data
+    ).then((response: any) => {
+          let data = response.data
+          if (data['status'] != 200) {
+            return
+          }
+          data["data"]["data"].forEach((val: any, idx: any, array: any) => {
+            tableData.value.push({
+              item_id: val['item_id'],
+              name: val['name'],
+              price: val['price'],
+              item_count: val['quantity']
+            })
           })
-        })
-        page.item_count = parseInt(data['data']['count'])
-        listLoading.value = false
-      }
-  )
+          page.item_count = parseInt(data['data']['count'])
+          listLoading.value = false
+        }
+    )
+  }
 }
 
 function handleSizeChange() {
