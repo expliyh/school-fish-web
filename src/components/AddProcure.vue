@@ -10,7 +10,7 @@ const prefillStore = usePrefillStore()
 // do not use same name with ref
 const form = reactive({
   name: '',
-  id: 0,
+  id: null as number | null,
   prize: 0,
   count: 0,
   model: ""
@@ -20,6 +20,16 @@ const form = reactive({
 const global: any = inject("global")
 
 const prefilled = ref(false)
+const auto = ref(false)
+
+function clearInput() {
+  form.name = ""
+  form.id = null
+  form.prize = 0
+  form.count = 0
+  form.model = ""
+  auto.value = false
+}
 
 function loadFromName() {
   console.log('load from name')
@@ -44,6 +54,7 @@ function loadFromName() {
           // 其他状态码处理
           console.log('其他状态码处理');
         }
+        auto.value = true
       })
       .catch((error: AxiosError) => {
         // 请求失败
@@ -60,11 +71,16 @@ function loadFromName() {
           // 其他错误
           console.log('其他错误', error.message);
         }
+        auto.value = false
       });
 }
 
 function loadFromID() {
   console.log('load from id')
+  if (form.id === null) {
+    clearInput()
+    return
+  }
   global.axios.postForm(
       global.api_base + "/get-inventory-by-id",
       {
@@ -90,6 +106,7 @@ function loadFromID() {
           // 其他状态码处理
           console.log('其他状态码处理');
         }
+        auto.value = true
       })
       .catch((error: AxiosError) => {
         // 请求失败
@@ -108,6 +125,7 @@ function loadFromID() {
           // 其他错误
           console.log('其他错误', error.message);
         }
+        auto.value = false
       });
 }
 
@@ -181,6 +199,11 @@ function cancelPrefill() {
   prefilled.value = false
 }
 
+function idSetAuto() {
+  form.id = null
+  clearInput()
+}
+
 handlePrefill()
 
 </script>
@@ -198,7 +221,14 @@ handlePrefill()
       <el-input v-model="form.name" v-model:disabled="prefilled" @change="loadFromName"/>
     </el-form-item>
     <el-form-item label="商品ID">
-      <el-input-number v-model="form.id" v-model:disabled="prefilled" @change="loadFromID"/>
+      <el-input-number
+          v-model="form.id"
+          v-model:disabled="prefilled"
+          placeholder="auto"
+          @change="loadFromID"
+      />
+
+      <el-button v-if="!prefilled" @click="idSetAuto" style="margin-left: 15px">自动</el-button>
     </el-form-item>
     <el-form-item label="单价">
       <el-input-number v-model="form.prize" :precision="2"></el-input-number>
@@ -207,7 +237,7 @@ handlePrefill()
       <el-input-number v-model="form.count"></el-input-number>
     </el-form-item>
     <el-form-item label="型号">
-      <el-input v-model="form.model" v-model:disabled="prefilled"></el-input>
+      <el-input v-model="form.model" v-model:disabled="auto"></el-input>
     </el-form-item>
     <!--    <el-form-item label="Activity zone">-->
     <!--      <el-select v-model="form.region" placeholder="please select your zone">-->

@@ -10,6 +10,8 @@ const userStore = useUserStore()
 
 const prefillStore = usePrefillStore()
 
+const listLoading = ref(false)
+
 const page = reactive(
     {
       currentPage: 1,
@@ -17,19 +19,17 @@ const page = reactive(
       item_count: 0
     }
 )
-let tp: any[] = []
-const tableData = ref(tp)
+// let tp: any[] = []
+const tableData = ref([] as any[])
 
 const global: any = inject("global")
-
-const listLoading = ref(false)
 
 const role = ref("")
 
 function loadData() {
   listLoading.value = true
-  const api_link = global.api_base + "/get-inventory-list"
-  tableData.value = tp
+  const api_link = global.api_base + "/get-ticket-list"
+  tableData.value = []
   role.value = userStore.getRole()
   console.log(role.value)
   global.axios.postForm(
@@ -42,37 +42,47 @@ function loadData() {
   ).then((response: any) => {
         let data = response.data
         if (data['status'] != 200) {
+          listLoading.value = false
           return
         }
-        data["data"]["data"].forEach((val: any, idx: any, array: any) => {
+        data["data"].forEach((val: any, idx: any, array: any) => {
           tableData.value.push({
+            ticket_id: val['id'],
             item_id: val['item_id'],
-            name: val['name'],
-            price: val['price'],
-            item_count: val['quantity']
+            type: val['type'],
+            status: val['status'],
+            desc: val['desc'],
+            date: val['add_date'],
           })
         })
-        page.item_count = parseInt(data['data']['count'])
-        listLoading.value = false
+        page.item_count = parseInt(data['count'])
       }
   )
+  listLoading.value = false
 }
 
 function handleSizeChange() {
-  return
+  loadData()
 }
 
 function handleCurrentChange() {
-  return
+  loadData()
 }
 
 loadData()
 
-function procure(row: any) {
+function edit(row: any) {
   console.log(row)
   prefillStore.clear()
-  prefillStore.setItemId(row['item_id'])
-  router.push("/panel/add-proc")
+  prefillStore.setTicketId(row['ticket_id'])
+  router.push("/panel/add-ticket")
+}
+
+function express(row: any) {
+  console.log(row)
+  prefillStore.clear()
+  prefillStore.setTicketId(row['ticket_id'])
+  router.push("/panel/express")
 }
 
 function sale(row: any) {
@@ -82,43 +92,31 @@ function sale(row: any) {
   router.push("/panel/add-sale")
 }
 
-function addTicket(row: any) {
-  console.log(row)
-  prefillStore.clear()
-  prefillStore.setItemId(row['item_id'])
-  router.push("/panel/add-ticket")
-}
-
 </script>
 
 <template>
   <el-table v-model:data="tableData" v-loading="listLoading" style="width: 100%">
-    <el-table-column prop="item_id" label="库存号" width="180"/>
-    <el-table-column prop="name" label="商品名称" width="100"/>
-    <el-table-column prop="price" label="商品进价" width="100"/>
-    <el-table-column prop="item_count" label="库存量" width="150"/>
-    <el-table-column label="操作" width="180">
+    <el-table-column prop="ticket_id" label="工单号" width="70"/>
+    <el-table-column prop="item_id" label="设备号" width="70"/>
+    <el-table-column prop="type" label="工单类型" width="100"/>
+    <el-table-column prop="status" label="工单状态" width="100"/>
+    <el-table-column prop="date" label="创建日期" width="170"/>
+    <el-table-column prop="desc" label="备注" width="150"/>
+    <el-table-column label="操作" fixed="right" width="190">
       <template #default="{row}">
         <el-button
             type="primary"
-            v-if="userStore.getRole()=='marketing'"
+            v-if="userStore.getRole()=='eng'"
             round plain
-            @click="procure(row)">
-          采购
-        </el-button>
-        <el-button
-            type="primary"
-            v-if="userStore.getRole()=='marketing'"
-            round plain
-            @click="sale(row)">
-          销售
+            @click="edit(row)">
+          查看/修改
         </el-button>
         <el-button
             type="primary"
             v-if="userStore.getRole()=='eng'"
             round plain
-            @click="addTicket(row)">
-          工单录入
+            @click="express(row)">
+          发货
         </el-button>
         <el-button type="primary" v-if="userStore.getRole()=='money'" round plain>查看记录</el-button>
       </template>

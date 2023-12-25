@@ -17,6 +17,7 @@ declare module 'vue' {
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCol: typeof import('element-plus/es')['ElCol']
+    ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElFooter: typeof import('element-plus/es')['ElFooter']
@@ -57,12 +58,17 @@ declare module 'vue' {
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     InventoryList: typeof import('./src/components/InventoryList.vue')['default']
     Login: typeof import('./src/components/Login.vue')['default']
+    ProcureList: typeof import('./src/components/ProcureList.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShouHouFaHuo: typeof import('./src/components/ShouHouFaHuo.vue')['default']
     ShowOrder: typeof import('./src/components/Orders/ShowOrder.vue')['default']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
+    TicketList: typeof import('./src/components/TicketList.vue')['default']
     WaitForOperate: typeof import('./src/components/Orders/WaitForOperate.vue')['default']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

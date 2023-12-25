@@ -34,6 +34,10 @@ export const usePrefillStore = defineStore('prefill', () => {
         }
     }
 
+    function getTicketId(this: any) {
+        return this.ticket_id
+    }
+
     function reset(this: any) {
         this.item_id = ""
         this.item_name = ""
@@ -44,5 +48,5 @@ export const usePrefillStore = defineStore('prefill', () => {
         this.reset()
     }
 
-    return {item_id, item_name, ticket_id, setItemId, getItemId, setItemName, setTicketId, reset, clear}
+    return {item_id, item_name, ticket_id, setItemId, getItemId, setItemName, setTicketId, getTicketId, reset, clear}
 })

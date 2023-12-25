@@ -3,6 +3,8 @@ import {RouterLink, RouterView} from 'vue-router'
 import router from "@/router";
 import {useUserStore} from "@/stores/user";
 
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+
 const userStore = useUserStore()
 
 if (localStorage.token == null) {
@@ -13,7 +15,9 @@ if (localStorage.token == null) {
 </script>
 
 <template>
-  <router-view></router-view>
+  <el-config-provider :locale="zhCn">
+    <router-view></router-view>
+  </el-config-provider>
 </template>
 
 <style>

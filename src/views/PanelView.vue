@@ -19,6 +19,10 @@ const handleOpen = (key: string, keyPath: string[]) => {
 const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
+
+function getPath() {
+  return router.currentRoute.value.path
+}
 </script>
 
 <template>
@@ -29,53 +33,65 @@ const handleClose = (key: string, keyPath: string[]) => {
     <el-container>
       <el-aside :xs="0" :sm="2" :md="4" :lg="4" :xl="4">
         <el-menu
-            default-active="2"
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
+            :default-active="getPath()"
             :router="true"
         >
-          <el-menu-item index="0" route="/panel">
+          <el-menu-item index="/panel">
             <el-icon>
               <home-filled/>
             </el-icon>
             <span>用户中心</span>
           </el-menu-item>
-          <el-menu-item v-if="userStore.getRole()=='marketing'" index="1" route="/panel/add-proc">
+          <el-menu-item v-if="userStore.getRole()=='marketing'" index="/panel/add-proc">
             <el-icon>
               <user-filled/>
             </el-icon>
             <span>采购录入</span>
           </el-menu-item>
-          <el-menu-item v-if="userStore.getRole()=='eng'" index="1" route="/panel/add-ticket">
+          <el-menu-item v-if="userStore.getRole()=='eng'" index="/panel/add-ticket">
             <el-icon>
               <user-filled/>
             </el-icon>
             <span>工单录入</span>
           </el-menu-item>
-          <el-menu-item v-if="userStore.getRole()=='money'" index="1" route="/panel/count">
+          <el-menu-item v-if="userStore.getRole()=='money'" index="/panel/count">
             <el-icon>
               <user-filled/>
             </el-icon>
             <span>数据统计</span>
           </el-menu-item>
-          <el-menu-item v-if="userStore.getRole()=='marketing'" index="2" route="/panel/add-sale">
+          <el-menu-item v-if="userStore.getRole()=='marketing'" index="/panel/add-sale">
             <el-icon>
               <user-filled/>
             </el-icon>
             <span>销售录入</span>
           </el-menu-item>
-          <el-menu-item v-if="userStore.getRole()=='eng'" index="2" route="/panel/express">
+          <el-menu-item v-if="userStore.getRole()=='eng'" index="/panel/express">
             <el-icon>
               <user-filled/>
             </el-icon>
             <span>售后发货</span>
           </el-menu-item>
-          <el-menu-item index="3" route="/panel/inventory-list">
+          <el-menu-item index="/panel/inventory-list">
             <el-icon>
               <List/>
             </el-icon>
             <span>设备列表</span>
+          </el-menu-item>
+          <el-menu-item v-if="userStore.getRole()==='eng'" index="/panel/ticket-list">
+            <el-icon>
+              <List/>
+            </el-icon>
+            <span>工单列表</span>
+          </el-menu-item>
+          <el-menu-item v-if="userStore.getRole()==='money'" index="/panel/procure-list">
+            <el-icon>
+              <List/>
+            </el-icon>
+            <span>采购列表</span>
           </el-menu-item>
         </el-menu>
       </el-aside>

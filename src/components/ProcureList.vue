@@ -26,6 +26,11 @@ const listLoading = ref(false)
 
 const role = ref("")
 
+const filter = reactive({
+  name_key: '',
+  id: ''
+})
+
 function loadData() {
   listLoading.value = true
   const api_link = global.api_base + "/get-inventory-list"

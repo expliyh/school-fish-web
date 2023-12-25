@@ -6,8 +6,10 @@ import {
 } from '@element-plus/icons-vue'
 import {ElMessage} from 'element-plus'
 import {useUserStore} from "@/stores/user";
+import {usePrefillStore} from "@/stores/prefill";
 
 const userStore = useUserStore()
+const prefillStore = usePrefillStore()
 const token = localStorage.token
 
 const global: any = inject("global")

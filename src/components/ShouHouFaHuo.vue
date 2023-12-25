@@ -3,8 +3,12 @@ import {reactive, ref, inject} from "vue";
 import type {AxiosResponse} from "axios";
 import router from "@/router";
 import {ElMessage} from "element-plus";
+import {usePrefillStore} from "@/stores/prefill";
 
+const prefillStore = usePrefillStore()
 const global: any = inject("global")
+
+const prefilled = ref(false)
 
 const form = reactive({
   id: '',
@@ -80,20 +84,48 @@ const onSubmit = () => {
   })
 }
 
+function handlePrefill() {
+  if (prefillStore.getTicketId() == "") {
+    return
+  }
+  console.log('prefill')
+  form.id = prefillStore.getTicketId()
+  loadTicket()
+  prefillStore.clear()
+  prefilled.value = true
+}
+
+function cancelPrefill() {
+  prefillStore.clear()
+  prefilled.value = false
+}
+
+handlePrefill()
 </script>
 
 <template>
-  <el-alert v-model:title="alert_box.title" v-model:type="alert_box.type" center :closable="false"/>
+  <el-alert
+      v-if="prefilled"
+      title="部分数据已预装填，要更改不可用的内容请点击 取消预装填 按钮"
+      center :closable="false" type="success"
+      style="margin-bottom: 10px"
+  ></el-alert>
+  <el-alert
+      v-model:title="alert_box.title"
+      v-model:type="alert_box.type"
+      center :closable="false"
+      style="margin-bottom: 10px"
+  />
   <el-form :model="form" label-width="120px">
     <el-form-item label="工单编号" @change="loadTicket">
-      <el-input v-model="form.id"/>
+      <el-input v-model:readonly="prefilled" v-model="form.id"/>
     </el-form-item>
     <el-form-item label="快递单号">
       <el-input v-model="express_info.express_id" placeholder="请输入快递单号"/>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" v-model:disabled="disable_submit" @click="onSubmit">发货</el-button>
-      <el-button>Cancel</el-button>
+      <el-button v-if="prefilled" @click="cancelPrefill">取消预装填</el-button>
     </el-form-item>
   </el-form>
 </template>

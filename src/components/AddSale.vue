@@ -1,20 +1,36 @@
 <script setup lang="ts">
-import {inject, reactive} from 'vue'
+import {inject, reactive, ref} from 'vue'
 import type {AxiosError, AxiosResponse} from "axios";
 import router from "@/router";
 import {ElMessage} from "element-plus";
+import {usePrefillStore} from "@/stores/prefill";
+
+const prefillStore = usePrefillStore()
 
 // do not use same name with ref
+
+
 const form = reactive({
   name: '',
-  id: 0,
+  id: null as number | null,
   prize: 0,
   count: 0,
   model: ""
 })
 
+const prefilled = ref(false)
+const auto = ref(false)
 
 const global: any = inject("global")
+
+function clearInput() {
+  form.name = ""
+  form.id = null
+  form.prize = 0
+  form.count = 0
+  form.model = ""
+  auto.value = false
+}
 
 function loadFromName() {
   console.log('load from name')
@@ -39,6 +55,7 @@ function loadFromName() {
           // 其他状态码处理
           console.log('其他状态码处理');
         }
+        auto.value = true
       })
       .catch((error: AxiosError) => {
         // 请求失败
@@ -47,6 +64,13 @@ function loadFromName() {
           console.log('请求失败', error.response.status);
           if (error.response.status == 403) {
             router.push("/login")
+          } else if (error.response.status == 404) {
+            auto.value = false
+            form.id = 0
+            form.count = 0
+            form.prize = 0
+            form.model = ""
+            return
           }
         } else if (error.request) {
           // 请求发送成功，但没有收到响应
@@ -55,11 +79,16 @@ function loadFromName() {
           // 其他错误
           console.log('其他错误', error.message);
         }
+        auto.value = false
       });
 }
 
 function loadFromID() {
   console.log('load from id')
+  if (form.id === null) {
+    clearInput()
+    return
+  }
   global.axios.postForm(
       global.api_base + "/get-inventory-by-id",
       {
@@ -85,6 +114,7 @@ function loadFromID() {
           // 其他状态码处理
           console.log('其他状态码处理');
         }
+        auto.value = true
       })
       .catch((error: AxiosError) => {
         // 请求失败
@@ -94,6 +124,11 @@ function loadFromID() {
           if (error.response.status == 403) {
             router.push("/login")
           } else if (error.response.status == 404) {
+            auto.value = false
+            form.name = ""
+            form.count = 0
+            form.prize = 0
+            form.model = ""
             return
           }
         } else if (error.request) {
@@ -103,6 +138,7 @@ function loadFromID() {
           // 其他错误
           console.log('其他错误', error.message);
         }
+        auto.value = false
       });
 }
 
@@ -159,16 +195,54 @@ const onSubmit = () => {
         }
       });
 }
+
+function handlePrefill() {
+  if (prefillStore.getItemId() == "") {
+    return
+  }
+  console.log('prefill')
+  form.id = prefillStore.getItemId()
+  loadFromID()
+  prefillStore.clear()
+  prefilled.value = true
+}
+
+function cancelPrefill() {
+  prefillStore.clear()
+  prefilled.value = false
+}
+
+function idSetAuto() {
+  form.id = null
+  clearInput()
+}
+
+handlePrefill()
+
+
 </script>
 
 <template>
   <h1>销售录入</h1>
+  <el-alert
+      v-if="prefilled"
+      title="部分数据已预装填，要更改不可用的内容请点击 取消预装填 按钮"
+      center :closable="false" type="success"
+      style="margin-bottom: 10px"
+  ></el-alert>
   <el-form :model="form" label-width="120px">
     <el-form-item label="商品名称">
-      <el-input v-model="form.name" @change="loadFromName"/>
+      <el-input v-model="form.name" v-model:disabled="prefilled" @change="loadFromName"/>
     </el-form-item>
     <el-form-item label="商品ID">
-      <el-input-number v-model="form.id" @change="loadFromID"/>
+      <el-input-number
+          v-model="form.id"
+          :step-strictly="true"
+          placeholder="ID"
+          v-model:readonly="prefilled"
+          :min="1"
+          @change="loadFromID"
+      />
     </el-form-item>
     <el-form-item label="单价">
       <el-input-number v-model="form.prize" :precision="2"></el-input-number>
@@ -177,7 +251,7 @@ const onSubmit = () => {
       <el-input-number v-model="form.count"></el-input-number>
     </el-form-item>
     <el-form-item label="型号">
-      <el-input v-model="form.model"></el-input>
+      <el-input v-model="form.model" v-model:disabled="auto"></el-input>
     </el-form-item>
     <!--    <el-form-item label="Activity zone">-->
     <!--      <el-select v-model="form.region" placeholder="please select your zone">-->
@@ -226,8 +300,8 @@ const onSubmit = () => {
     <!--      <el-input v-model="form.desc" type="textarea"/>-->
     <!--    </el-form-item>-->
     <el-form-item>
-      <el-button type="primary" @click="onSubmit">Create</el-button>
-      <el-button>Cancel</el-button>
+      <el-button type="primary" @click="onSubmit">提交销售</el-button>
+      <el-button v-if="prefilled" @click="cancelPrefill">取消预装填</el-button>
     </el-form-item>
   </el-form>
 </template>

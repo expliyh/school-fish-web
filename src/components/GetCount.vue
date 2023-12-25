@@ -6,13 +6,13 @@ import {InfoFilled} from "@element-plus/icons-vue";
 const global: any = inject("global")
 
 const time_select = ref<[Date, Date]>([
-  new Date(2023, 12, 11, 0, 0),
+  new Date(1970, 11, 11, 0, 0),
   new Date(),
 ])
 
 const shortcuts = [
   {
-    text: '上周',
+    text: '七日内',
     value: () => {
       const end = new Date()
       const start = new Date()
@@ -21,7 +21,7 @@ const shortcuts = [
     },
   },
   {
-    text: '上个月',
+    text: '三十日内',
     value: () => {
       const end = new Date()
       const start = new Date()
@@ -29,7 +29,73 @@ const shortcuts = [
       return [start, end]
     },
   },
+  {
+    text: '九十日内',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      return [start, end]
+    },
+  },
+  {
+    text: '365日内',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      return [start, end]
+    },
+  },
+  {
+    text: '今天',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setSeconds(0)
+      start.setMinutes(0)
+      start.setHours(0)
+      // start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      return [start, end]
+    },
+  },
+  {
+    text: '本月',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setSeconds(0)
+      start.setMinutes(0)
+      start.setHours(0)
+      start.setDate(1)
+      // start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      return [start, end]
+    },
+  },
+  {
+    text: '今年',
+    value: () => {
+      const end = new Date()
+      const start = new Date()
+      start.setSeconds(0)
+      start.setMinutes(0)
+      start.setHours(0)
+      start.setDate(1)
+      start.setMonth(0)
+      // start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+      return [start, end]
+    },
+  },
+  {
+    text: '全部',
+    value: () => {
+      const end = new Date()
+      const start = new Date(1970, 11, 11, 0, 0)
+      return [start, end]
+    },
+  },
 ]
+
 
 const count = ref({
   'sales_count': 'Undefined',
@@ -57,10 +123,13 @@ function get_count() {
     count.value = data['data']
   })
 }
+
+get_count()
+
 </script>
 
 <template>
-  <el-row>
+  <el-row style="margin-bottom: 20px">
     <el-col :span="2">
       <el-text>选择统计日期</el-text>
     </el-col>
@@ -70,9 +139,6 @@ function get_count() {
           v-model="time_select"
           type="datetimerange"
           :shortcuts="shortcuts"
-          range-separator="To"
-          start-placeholder="Start date"
-          end-placeholder="End date"
           @change="get_count"
       />
     </el-col>
