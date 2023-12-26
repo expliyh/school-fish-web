@@ -1,21 +1,19 @@
 <script setup lang="ts">
 
-import {InfoFilled, Search} from "@element-plus/icons-vue";
+import {
+  InfoFilled,
+  Search
+} from "@element-plus/icons-vue";
 import {reactive, inject, ref} from "vue";
 import {useUserStore} from "@/stores/user";
 import {usePrefillStore} from "@/stores/prefill";
 import router from "@/router";
 import {ElMessage} from "element-plus";
+import type {AxiosError} from "axios";
 
 const userStore = useUserStore()
 
 const prefillStore = usePrefillStore()
-
-const filter = reactive({
-  name_key: '',
-  id: '',
-  by: ''
-})
 
 const page = reactive(
     {
@@ -24,6 +22,7 @@ const page = reactive(
       item_count: 0
     }
 )
+
 const tableData = ref([] as any[])
 
 const global: any = inject("global")
@@ -32,10 +31,16 @@ const listLoading = ref(false)
 
 const role = ref("")
 
+const filter = reactive({
+  name_key: '',
+  id: '',
+  by: ''
+})
+
 function loadData() {
-  listLoading.value = true
-  const api_link = global.api_base + "/get-inventory-list"
   tableData.value = []
+  listLoading.value = true
+  const api_link = global.api_base + "/sales-list"
   role.value = userStore.getRole()
   console.log(role.value)
   let post_data = {
@@ -48,35 +53,56 @@ function loadData() {
   if (filter.name_key != '' || filter.name_key != null) {
     if (filter.by == 'item_name') {
       post_data['search'] = filter.name_key
-    } else if (filter.by == 'item_id' && filter.name_key != '' && filter.name_key != null) {
+    } else if (filter.by == 'item_id') {
       if (isNaN(parseInt(filter.name_key))) {
         ElMessage.error("库存编号必须为数字")
         return
       }
-      post_data['search_item_id'] = filter.name_key
     }
-    global.axios.postForm(
-        api_link,
-        post_data
-    ).then((response: any) => {
-          let data = response.data
-          if (data['status'] != 200) {
-            return
-          }
-          data["data"]["data"].forEach((val: any, idx: any, array: any) => {
-            tableData.value.push({
-              item_id: val['item_id'],
-              name: val['name'],
-              price: val['price'] + ' 元',
-              model: val['model'],
-              item_count: val['quantity']
-            })
-          })
-          page.item_count = parseInt(data['data']['count'])
-          listLoading.value = false
-        }
-    )
+    post_data['search_item_id'] = filter.name_key
   }
+  global.axios.postForm(
+      api_link,
+      post_data
+  ).then((response: any) => {
+        let data = response.data
+        if (data['status'] != 200) {
+          return
+        }
+        data["data"].forEach((val: any, idx: any, array: any) => {
+          tableData.value.push({
+            id: val['id'],
+            item_id: val['item_id'],
+            item_name: val['item_name'],
+            price: val['price'] + ' 元',
+            date: val['date'],
+            salesman_name: val['salesman_name'],
+            item_count: val['quantity']
+          })
+        })
+        page.item_count = parseInt(data['count'])
+        listLoading.value = false
+      }
+  ).catch((error: AxiosError) => {
+    // 请求失败
+    if (error.response) {
+      // 服务器返回响应，但状态码不是2xx
+      console.log('请求失败', error.response.status);
+      if (error.response.status == 403) {
+        router.push("/login")
+      } else if (error.response.status == 404) {
+        return
+      } else if (error.response.status == 500) {
+        ElMessage.error("服务器内部错误")
+      }
+    } else if (error.request) {
+      // 请求发送成功，但没有收到响应
+      console.log('请求发送成功，但没有收到响应');
+    } else {
+      // 其他错误
+      console.log('其他错误', error.message);
+    }
+  });
 }
 
 function handleSizeChange() {
@@ -86,8 +112,6 @@ function handleSizeChange() {
 function handleCurrentChange() {
   loadData()
 }
-
-loadData()
 
 function procure(row: any) {
   console.log(row)
@@ -110,20 +134,6 @@ function addTicket(row: any) {
   router.push("/panel/add-ticket")
 }
 
-function procureList(row: any) {
-  prefillStore.clear()
-  prefillStore.filter.name_key = row['item_id']
-  prefillStore.filter.by = 'item_id'
-  router.push("/panel/procure-list")
-}
-
-function salesList(row: any) {
-  prefillStore.clear()
-  prefillStore.filter.name_key = row['item_id']
-  prefillStore.filter.by = 'item_id'
-  router.push("/panel/sales-list")
-}
-
 function handlePrefill() {
   if (prefillStore.filter.by === 'item_id') {
     filter.by = 'item_id'
@@ -131,6 +141,8 @@ function handlePrefill() {
   }
   loadData()
 }
+
+handlePrefill()
 
 function getSearchPlaceHolder() {
   if (filter.by === '') {
@@ -146,9 +158,9 @@ function getSearchPlaceHolder() {
 </script>
 
 <template>
-  <el-row style="margin-bottom: 20px">
+  <el-row>
     <el-col :span="12">
-      <el-text>库存列表</el-text>
+      <el-text>销售列表</el-text>
     </el-col>
     <el-col :span="9">
       <el-input
@@ -169,53 +181,15 @@ function getSearchPlaceHolder() {
       </el-input>
     </el-col>
   </el-row>
+
   <el-table v-model:data="tableData" v-loading="listLoading" style="width: 100%">
-    <el-table-column prop="item_id" label="库存号" width="70"/>
-    <el-table-column prop="name" label="商品名称" min-width="100"/>
-    <el-table-column prop="price" label="商品进价" width="100"/>
+    <el-table-column prop="id" label="销售单号" width="90"/>
+    <el-table-column prop="salesman_name" label="销售人" width="170"/>
+    <el-table-column prop="item_name" label="设备名称" min-width="100"/>
+    <el-table-column prop="item_id" label="库存编号" width="100"/>
+    <el-table-column prop="price" label="商品售价" width="100"></el-table-column>
     <el-table-column prop="item_count" label="库存量" width="150"/>
-    <el-table-column prop="model" label="型号" min-width="150"/>
-    <el-table-column label="操作" fixed="right" width="220">
-      <template #default="{row}">
-        <el-button
-            type="primary"
-            v-if="userStore.getRole()=='marketing'"
-            round plain
-            @click="procure(row)">
-          采购
-        </el-button>
-        <el-button
-            type="primary"
-            v-if="userStore.getRole()=='marketing'"
-            round plain
-            @click="sale(row)">
-          销售
-        </el-button>
-        <el-button
-            type="primary"
-            v-if="userStore.getRole()=='eng'"
-            round plain
-            @click="addTicket(row)">
-          工单录入
-        </el-button>
-        <el-button
-            type="primary"
-            v-if="userStore.getRole()=='money'"
-            round plain
-            @click="procureList(row)"
-        >
-          采购记录
-        </el-button>
-        <el-button
-            type="primary"
-            v-if="userStore.getRole()=='money'"
-            round plain
-            @click="salesList(row)"
-        >
-          销售记录
-        </el-button>
-      </template>
-    </el-table-column>
+    <el-table-column prop="date" label="提交时间" width="160"/>
   </el-table>
   <div class="pagination-block">
     <el-pagination

@@ -9,6 +9,7 @@ import {useUserStore} from "@/stores/user";
 import {usePrefillStore} from "@/stores/prefill";
 import router from "@/router";
 import {ElMessage} from "element-plus";
+import type {AxiosError} from "axios";
 
 const userStore = useUserStore()
 
@@ -46,10 +47,12 @@ function loadData() {
     "access_token": localStorage.token,
     "page": page.currentPage,
     "page_size": page.pageSize,
+    "search": null as string | null,
+    "search_item_id": null as string | null
   }
   if (filter.name_key != '' || filter.name_key != null) {
     if (filter.by == 'item_name') {
-      post_data['item_name'] = filter.name_key
+      post_data['search'] = filter.name_key
     } else if (filter.by == 'item_id') {
       if (isNaN(parseInt(filter.name_key))) {
         ElMessage.error("库存编号必须为数字")
@@ -73,21 +76,41 @@ function loadData() {
             item_name: val['item_name'],
             price: val['price'] + ' 元',
             date: val['date'],
+            purchaser_name: val['purchaser_name'],
             item_count: val['quantity']
           })
         })
         page.item_count = parseInt(data['count'])
         listLoading.value = false
       }
-  )
+  ).catch((error: AxiosError) => {
+    // 请求失败
+    if (error.response) {
+      // 服务器返回响应，但状态码不是2xx
+      console.log('请求失败', error.response.status);
+      if (error.response.status == 403) {
+        router.push("/login")
+      } else if (error.response.status == 404) {
+        return
+      } else if (error.response.status == 500) {
+        ElMessage.error("服务器内部错误")
+      }
+    } else if (error.request) {
+      // 请求发送成功，但没有收到响应
+      console.log('请求发送成功，但没有收到响应');
+    } else {
+      // 其他错误
+      console.log('其他错误', error.message);
+    }
+  });
 }
 
 function handleSizeChange() {
-  return
+  loadData()
 }
 
 function handleCurrentChange() {
-  return
+  loadData()
 }
 
 function procure(row: any) {
@@ -161,9 +184,10 @@ function getSearchPlaceHolder() {
 
   <el-table v-model:data="tableData" v-loading="listLoading" style="width: 100%">
     <el-table-column prop="id" label="采购单号" width="90"/>
-    <el-table-column prop="item_name" label="商品名称" width="100"/>
+    <el-table-column prop="purchaser_name" label="采购人" width="120"/>
+    <el-table-column prop="item_name" label="设备名称" min-width="100"/>
     <el-table-column prop="item_id" label="库存编号" width="100"/>
-    <el-table-column prop="price" label="商品进价" width="100"></el-table-column>
+    <el-table-column prop="price" label="设备进价" width="100"></el-table-column>
     <el-table-column prop="item_count" label="库存量" width="150"/>
     <el-table-column prop="date" label="提交时间" width="160"/>
   </el-table>

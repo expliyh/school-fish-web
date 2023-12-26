@@ -50,6 +50,7 @@ function loadData() {
             ticket_id: val['id'],
             item_id: val['item_id'],
             type: val['type'],
+            eng_name: val['eng_name'],
             status: val['status'],
             desc: val['desc'],
             date: val['add_date'],
@@ -97,11 +98,12 @@ function sale(row: any) {
 <template>
   <el-table v-model:data="tableData" v-loading="listLoading" style="width: 100%">
     <el-table-column prop="ticket_id" label="工单号" width="70"/>
+    <el-table-column prop="eng_name" label="负责人" width="140"/>
     <el-table-column prop="item_id" label="设备号" width="70"/>
     <el-table-column prop="type" label="工单类型" width="100"/>
     <el-table-column prop="status" label="工单状态" width="100"/>
     <el-table-column prop="date" label="创建日期" width="170"/>
-    <el-table-column prop="desc" label="备注" width="150"/>
+    <el-table-column prop="desc" label="备注" min-width="150"/>
     <el-table-column label="操作" fixed="right" width="190">
       <template #default="{row}">
         <el-button

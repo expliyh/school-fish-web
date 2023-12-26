@@ -75,6 +75,10 @@ const router = createRouter({
                     component: () => import('@/components/ProcureList.vue'),
                 },
                 {
+                    path: 'sales-list',
+                    component: () => import('@/components/SalesList.vue'),
+                },
+                {
                     path: 'ticket-list',
                     component: () => import('@/components/TicketList.vue'),
                 },

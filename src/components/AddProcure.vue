@@ -4,6 +4,7 @@ import type {AxiosError, AxiosResponse} from "axios";
 import router from "@/router";
 import {ElMessage} from "element-plus";
 import {usePrefillStore} from "@/stores/prefill";
+import {an} from "vitest/dist/reporters-5f784f42";
 
 const prefillStore = usePrefillStore()
 
@@ -121,6 +122,9 @@ function loadFromID() {
               clearInput()
             }
             return
+          } else if (error.response.status == 400) {
+            let errdata = error.response.data as any
+            ElMessage.error("BadRequest: " + errdata['message'])
           }
         } else if (error.request) {
           // 请求发送成功，但没有收到响应
@@ -185,6 +189,9 @@ const onSubmit = () => {
           console.log('请求失败', error.response.status);
           if (error.response.status == 403) {
             router.push("/login")
+          } else if (error.response.status == 400) {
+            let errdata = error.response.data as any
+            ElMessage.error("BadRequest: " + errdata['message'])
           }
         } else if (error.request) {
           // 请求发送成功，但没有收到响应

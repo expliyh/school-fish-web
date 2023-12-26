@@ -2,8 +2,9 @@
 import {inject, ref} from 'vue';
 import 'element-plus/es/components/message/style/css'
 import {ElMessage} from "element-plus";
-import type {AxiosResponse} from "axios";
+import type {AxiosError, AxiosResponse} from "axios";
 import {useUserStore} from "@/stores/user";
+import router from "@/router";
 
 const userStore = useUserStore()
 
@@ -43,10 +44,29 @@ const handleSubmit = () => {
         userStore.setAccessToken(data['access_token'])
         userStore.setUsername(data['username'])
         localStorage.token = data['access_token']
-        window.location.href = "/"
+        router.push("/panel")
+        ElMessage.success('登录成功！')
       }
-  )
-  alert('登录成功！');
+  ).catch((error: AxiosError) => {
+    // 请求失败
+    if (error.response) {
+      // 服务器返回响应，但状态码不是2xx
+      console.log('请求失败', error.response.status);
+      if (error.response.status == 403) {
+        ElMessage.error("Forbidden: 用户名或密码错误")
+      } else if (error.response.status == 404) {
+        return
+      } else if (error.response.status == 500) {
+        ElMessage.error("服务器内部错误")
+      }
+    } else if (error.request) {
+      // 请求发送成功，但没有收到响应
+      console.log('请求发送成功，但没有收到响应');
+    } else {
+      // 其他错误
+      console.log('其他错误', error.message);
+    }
+  });
   // 执行登录操作，例如发起网络请求等
 };
 

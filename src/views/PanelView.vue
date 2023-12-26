@@ -7,6 +7,10 @@ import {
   Setting,
   WalletFilled,
   List,
+  Loading,
+  Sell,
+  SoldOut,
+  Ticket,
 } from '@element-plus/icons-vue'
 import router from "@/router";
 import {useUserStore} from "@/stores/user";
@@ -27,8 +31,8 @@ function getPath() {
 
 <template>
   <el-container>
-    <el-header height="60px">
-      Header
+    <el-header style="display:flex;align-items: center" height="60px">
+      <h1 style="margin-left: 30px;">设备管理系统</h1>
     </el-header>
     <el-container>
       <el-aside :xs="0" :sm="2" :md="4" :lg="4" :xl="4">
@@ -47,13 +51,13 @@ function getPath() {
           </el-menu-item>
           <el-menu-item v-if="userStore.getRole()=='marketing'" index="/panel/add-proc">
             <el-icon>
-              <user-filled/>
+              <SoldOut/>
             </el-icon>
             <span>采购录入</span>
           </el-menu-item>
           <el-menu-item v-if="userStore.getRole()=='eng'" index="/panel/add-ticket">
             <el-icon>
-              <user-filled/>
+              <Ticket/>
             </el-icon>
             <span>工单录入</span>
           </el-menu-item>
@@ -65,7 +69,7 @@ function getPath() {
           </el-menu-item>
           <el-menu-item v-if="userStore.getRole()=='marketing'" index="/panel/add-sale">
             <el-icon>
-              <user-filled/>
+              <Sell/>
             </el-icon>
             <span>销售录入</span>
           </el-menu-item>
@@ -79,19 +83,33 @@ function getPath() {
             <el-icon>
               <List/>
             </el-icon>
-            <span>设备列表</span>
+            <span>库存列表</span>
           </el-menu-item>
-          <el-menu-item v-if="userStore.getRole()==='eng'" index="/panel/ticket-list">
+          <el-menu-item v-if="userStore.getRole()==='eng'||userStore.getRole()=='money'" index="/panel/ticket-list">
             <el-icon>
               <List/>
             </el-icon>
             <span>工单列表</span>
           </el-menu-item>
-          <el-menu-item v-if="userStore.getRole()==='money'" index="/panel/procure-list">
+          <el-menu-item v-if="userStore.getRole()==='money'||userStore.getRole()==='marketing'"
+                        index="/panel/procure-list">
             <el-icon>
               <List/>
             </el-icon>
             <span>采购列表</span>
+          </el-menu-item>
+          <el-menu-item v-if="userStore.getRole()==='money'||userStore.getRole()==='marketing'"
+                        index="/panel/sales-list">
+            <el-icon>
+              <List/>
+            </el-icon>
+            <span>销售列表</span>
+          </el-menu-item>
+          <el-menu-item index="/login">
+            <el-icon>
+              <Loading/>
+            </el-icon>
+            <span>重新登陆</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
@@ -99,7 +117,7 @@ function getPath() {
         <el-main>
           <router-view></router-view>
         </el-main>
-        <el-footer>Footer</el-footer>
+        <!--              <el-footer>Footer</el-footer>-->
       </el-container>
     </el-container>
   </el-container>

@@ -61,6 +61,7 @@ declare module 'vue' {
     ProcureList: typeof import('./src/components/ProcureList.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SalesList: typeof import('./src/components/SalesList.vue')['default']
     ShouHouFaHuo: typeof import('./src/components/ShouHouFaHuo.vue')['default']
     ShowOrder: typeof import('./src/components/Orders/ShowOrder.vue')['default']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
